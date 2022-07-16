@@ -1,0 +1,17 @@
+.pieces {
+  display: flex;
+  flex-direction: row;
+}
+
+.piece {
+  margin: 5px;
+  padding: 2px;
+  width: 60px;
+  height: 30px;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}

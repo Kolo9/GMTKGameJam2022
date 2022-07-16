@@ -1,0 +1,225 @@
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<script language='javascript'>
+	function run() {
+		WIDTH = 5;
+		HEIGHT = 5;
+		DIE = 6;
+		PIECES = ['-', '|', '┏', '┛', '┗', '┓'];
+		MODIFIERS = ['-1', '+1', '+2', '+3'];
+		buttons = [];
+		grid = [];
+		selected = [];
+
+		score = 0;
+
+		pieceObjs = [document.getElementById('piece1'), document.getElementById('piece2'),
+		  document.getElementById('piece3')
+		];
+		selectedPiece = undefined;
+
+		function submit() {
+		  let removed = new Set();
+
+		  for (i = 0; i < HEIGHT; i++) {
+			startJ = 0;
+			cur = grid[i][0];
+			for (j = 1; j < WIDTH; j++) {
+			  if (grid[i][j] != cur) {
+				if (j - startJ >= 3) {
+				  const clearLength = j - startJ;
+				  score += (clearLength - 2) * cur;
+				  for (let removeJ = startJ; removeJ < WIDTH; removeJ++) {
+					removed.add(i * WIDTH + removeJ);
+				  }
+				}
+				startJ = j;
+				cur = grid[i][j];
+			  }
+			}
+			if (WIDTH - startJ >= 3) {
+			  const clearLength = j - startJ;
+			  score += (clearLength - 2) * cur;
+			  for (let removeJ = startJ; removeJ < WIDTH; removeJ++) {
+				removed.add(i * WIDTH + removeJ);
+			  }
+			}
+		  }
+
+		  for (j = 0; j < WIDTH; j++) {
+			startI = 0;
+			cur = grid[startI][j];
+			for (i = 1; i < HEIGHT; i++) {
+			  if (grid[i][j] != cur) {
+				if (i - startI >= 3) {
+				  const clearLength = i - startI;
+				  score += (clearLength - 2) * cur;
+				  for (let removeI = startI; removeI < HEIGHT; removeI++) {
+					  removed.add(removeI * WIDTH + j);
+					}
+				}
+				startI = i;
+				cur = grid[i][j];
+			  }
+			}
+
+			if (HEIGHT - startI >= 3) {
+			  const clearLength = i - startI;
+			  score += (clearLength - 2) * cur;
+			  for (let removeI = startI; removeI < HEIGHT; removeI++) {
+				removed.add(removeI * WIDTH + j);
+			  }
+			}
+		  }
+
+
+		  /* console.log("Removing: ", [...removed]) */;
+		  for (const toRemove of removed) {
+			const i = Math.floor(toRemove / WIDTH);
+			const j = toRemove % WIDTH;
+			grid[i][j] = Math.floor(Math.random() * DIE + 1);
+			buttons[i][j].childNodes[0].nodeValue = grid[i][j];
+
+		  }
+		  if (removed.length) {
+			submit();
+		  } else {
+			updateScore();
+		  }
+
+		}
+
+		/* function submit() {
+		  console.log(selected);
+		  if (selected.length >= 3) {
+			const diff = grid[selected[1].i][selected[1].j] - grid[selected[0].i][selected[0].j]; 
+			let valid = true;
+			for (i = 2; i < selected.length; i++) {
+			  if (grid[selected[i].i][selected[i].j] - grid[selected[i-1].i][selected[i-1].j] != diff) {
+				valid = false;
+				break;
+			  }
+			}
+			if (valid) {
+			  selected.forEach(s => buttons[s.i][s.j].style.visibility = "hidden");
+			}
+		  }
+		  selected = [];
+		} */
+
+		/* gridFormatted = ""; */
+		for (i = 0; i < HEIGHT; i++) {
+		  grid.push([]);
+		  buttons.push([]);
+		  for (j = 0; j < WIDTH; j++) {
+			grid[i].push(Math.floor(Math.random() * DIE + 1));
+			const btn = document.createElement("button");
+			btn.classList.add('cell');
+			const t = document.createTextNode(grid[i][j]);
+			btn.appendChild(t);
+			const i2 = i;
+			const j2 = j;
+			btn.onclick = () => {
+			  btn.checked = !btn.checked;
+			  if (btn.checked) {
+				selected.push({
+				  i: i2,
+				  j: j2
+				});
+			  } else {
+				selected = selected.filter(s => s.i != i2 || s.j != j2);
+			  }
+			  btn.style.background = btn.checked ? 'lightgray' : null;
+			  t.nodeValue = grid[i2][j2];
+			};
+			document.getElementById('grid').appendChild(btn);
+			buttons[i].push(btn);
+		  }
+		  var br = document.createElement("br");
+		  document.getElementById('grid').appendChild(br);
+		  document.getElementById('place_piece').onclick = placePiece;
+		  pieceObjs.forEach(o => o.onclick = () => {
+			selectedPiece = o;
+			pieceObjs.forEach(o2 => o2.checked = false);
+			o.checked = !o.checked;
+			pieceObjs.forEach(o2 => o2.style.background = o2.checked ? 'lightgray' : null);
+		  });
+		  /* gridFormatted += grid[i].join(" ") + "\n"; */
+		}
+
+		for (i = 0; i < pieceObjs.length; i++) {
+		  generatePiece();
+		}
+		submit();
+		score = 0;
+		updateScore();
+	}
+
+	function placePiece() {
+	  if (!selectedPiece) {
+		return;
+	  }
+
+	  /* if (!selectedCellsMatchPiece()) {
+		return;
+	  } */
+	  if (!selectedPiece.innerHTML) {
+		// Piece already used.
+		return;
+	  }
+
+	  tmp = selectedPiece.innerHTML.split(" ");
+	  shape = tmp[0];
+	  modifier = parseInt(tmp[1]);
+
+	  selected.forEach(s => {
+		const i = s.i;
+		const j = s.j;
+		grid[i][j] += modifier;
+		if (grid[i][j] < 0) {
+		  grid[i][j] = 0;
+		}
+		buttons[i][j].checked = false;
+		buttons[i][j].style.background = buttons[i][j].checked ? 'lightgray' : null;
+		buttons[i][j].childNodes[0].nodeValue = grid[i][j];
+	  });
+	  selected = [];
+
+	  selectedPiece.innerHTML = "";
+	  selectedPiece = undefined;
+	  if (pieceObjs.every(p => !p.innerHTML)) {
+		submit();
+		for (i = 0; i < 3; i++) generatePiece();
+	  }
+	}
+
+	function generatePiece() {
+	  const pieceI = Math.floor(Math.random() * PIECES.length);
+	  const modifierI = Math.floor(Math.random() * MODIFIERS.length);
+
+	  // console.log(PIECES[pieceI] + " " + MODIFIERS[modifierI])
+	  i = 0;
+	  while (i < pieceObjs.length && pieceObjs[i].innerHTML !== "") i++;
+	  if (i > 2) {
+		// No room for pieces
+		return;
+	  }
+	  pieceObjs[i].innerHTML = PIECES[pieceI] + " " + MODIFIERS[modifierI];
+	}
+
+	function updateScore() {
+	  document.getElementById("score").innerHTML = score;
+	}
+</script>
+<body onload="run()">
+  Score: <text id="score"></text>
+  <pre id="grid"></pre>
+  <div class="pieces">
+    <button class="piece" id="piece1"></button>
+    <button class="piece" id="piece2"></button>
+    <button class="piece" id="piece3"></button>
+  </div>
+  <button id='place_piece'>Place Piece</button>
+</body>
+</html>
