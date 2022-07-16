@@ -3,8 +3,8 @@
 <link rel="stylesheet" href="style.css">
 <script language='javascript'>
 	function run() {
-		WIDTH = 5;
-		HEIGHT = 5;
+		WIDTH = 6;
+		HEIGHT = 6;
 		DIE = 6;
 		PIECES = ['-', '|', '┏', '┛', '┗', '┓'];
 		MODIFIERS = ['-1', '+1', '+2', '+3'];
@@ -188,6 +188,7 @@
 
 	  selectedPiece.innerHTML = "";
 	  selectedPiece = undefined;
+	  pieceObjs.forEach(o => {o.checked = false; o.style.background = null});;
 	  if (pieceObjs.every(p => !p.innerHTML)) {
 		submit();
 		for (i = 0; i < 3; i++) generatePiece();
