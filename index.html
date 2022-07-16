@@ -19,7 +19,73 @@
 		];
 		selectedPiece = undefined;
 
-		function submit() {
+		/* function submit() {
+		  console.log(selected);
+		  if (selected.length >= 3) {
+			const diff = grid[selected[1].i][selected[1].j] - grid[selected[0].i][selected[0].j]; 
+			let valid = true;
+			for (i = 2; i < selected.length; i++) {
+			  if (grid[selected[i].i][selected[i].j] - grid[selected[i-1].i][selected[i-1].j] != diff) {
+				valid = false;
+				break;
+			  }
+			}
+			if (valid) {
+			  selected.forEach(s => buttons[s.i][s.j].style.visibility = "hidden");
+			}
+		  }
+		  selected = [];
+		} */
+
+		/* gridFormatted = ""; */
+		for (i = 0; i < HEIGHT; i++) {
+		  grid.push([]);
+		  buttons.push([]);
+		  for (j = 0; j < WIDTH; j++) {
+			grid[i].push(Math.floor(Math.random() * DIE + 1));
+			const btn = document.createElement("button");
+			btn.classList.add('cell');
+			const t = document.createTextNode(grid[i][j]);
+			btn.appendChild(t);
+			const i2 = i;
+			const j2 = j;
+			btn.onclick = () => {
+			  btn.checked = !btn.checked;
+			  if (btn.checked) {
+				selected.push({
+				  i: i2,
+				  j: j2
+				});
+			  } else {
+				selected = selected.filter(s => s.i != i2 || s.j != j2);
+			  }
+			  btn.style.background = btn.checked ? 'lightgray' : null;
+			  t.nodeValue = grid[i2][j2];
+			};
+			document.getElementById('grid').appendChild(btn);
+			buttons[i].push(btn);
+		  }
+		  var br = document.createElement("br");
+		  document.getElementById('grid').appendChild(br);
+		  document.getElementById('place_piece').onclick = placePiece;
+		  pieceObjs.forEach(o => o.onclick = () => {
+			selectedPiece = o;
+			pieceObjs.forEach(o2 => o2.checked = false);
+			o.checked = !o.checked;
+			pieceObjs.forEach(o2 => o2.style.background = o2.checked ? 'lightgray' : null);
+		  });
+		  /* gridFormatted += grid[i].join(" ") + "\n"; */
+		}
+
+		for (i = 0; i < pieceObjs.length; i++) {
+		  generatePiece();
+		}
+		submit();
+		score = 0;
+		updateScore();
+	}
+
+	function submit() {
 		  let removed = new Set();
 
 		  for (i = 0; i < HEIGHT; i++) {
@@ -89,72 +155,6 @@
 		  }
 
 		}
-
-		/* function submit() {
-		  console.log(selected);
-		  if (selected.length >= 3) {
-			const diff = grid[selected[1].i][selected[1].j] - grid[selected[0].i][selected[0].j]; 
-			let valid = true;
-			for (i = 2; i < selected.length; i++) {
-			  if (grid[selected[i].i][selected[i].j] - grid[selected[i-1].i][selected[i-1].j] != diff) {
-				valid = false;
-				break;
-			  }
-			}
-			if (valid) {
-			  selected.forEach(s => buttons[s.i][s.j].style.visibility = "hidden");
-			}
-		  }
-		  selected = [];
-		} */
-
-		/* gridFormatted = ""; */
-		for (i = 0; i < HEIGHT; i++) {
-		  grid.push([]);
-		  buttons.push([]);
-		  for (j = 0; j < WIDTH; j++) {
-			grid[i].push(Math.floor(Math.random() * DIE + 1));
-			const btn = document.createElement("button");
-			btn.classList.add('cell');
-			const t = document.createTextNode(grid[i][j]);
-			btn.appendChild(t);
-			const i2 = i;
-			const j2 = j;
-			btn.onclick = () => {
-			  btn.checked = !btn.checked;
-			  if (btn.checked) {
-				selected.push({
-				  i: i2,
-				  j: j2
-				});
-			  } else {
-				selected = selected.filter(s => s.i != i2 || s.j != j2);
-			  }
-			  btn.style.background = btn.checked ? 'lightgray' : null;
-			  t.nodeValue = grid[i2][j2];
-			};
-			document.getElementById('grid').appendChild(btn);
-			buttons[i].push(btn);
-		  }
-		  var br = document.createElement("br");
-		  document.getElementById('grid').appendChild(br);
-		  document.getElementById('place_piece').onclick = placePiece;
-		  pieceObjs.forEach(o => o.onclick = () => {
-			selectedPiece = o;
-			pieceObjs.forEach(o2 => o2.checked = false);
-			o.checked = !o.checked;
-			pieceObjs.forEach(o2 => o2.style.background = o2.checked ? 'lightgray' : null);
-		  });
-		  /* gridFormatted += grid[i].join(" ") + "\n"; */
-		}
-
-		for (i = 0; i < pieceObjs.length; i++) {
-		  generatePiece();
-		}
-		submit();
-		score = 0;
-		updateScore();
-	}
 
 	function placePiece() {
 	  if (!selectedPiece) {
