@@ -3,14 +3,15 @@
 <link rel="stylesheet" href="style.css">
 <script language='javascript'>
 	function run() {
-		WIDTH = 6;
-		HEIGHT = 6;
+		WIDTH = 5;
+		HEIGHT = 5;
 		DIE = 6;
 		PIECES = ['-', '|', '┏', '┛', '┗', '┓'];
 		MODIFIERS = ['-1', '+1', '+2', '+3'];
 		buttons = [];
 		grid = [];
 		selected = [];
+		turns = 0;
 
 		score = 0;
 
@@ -83,6 +84,7 @@
 		submit();
 		score = 0;
 		updateScore();
+		updateTurns();
 	}
 
 	function submit() {
@@ -151,6 +153,7 @@
 		  if (removed.size) {
 			submit();
 		  } else {
+			updateTurns();
 			updateScore();
 		  }
 
@@ -190,6 +193,7 @@
 	  selectedPiece = undefined;
 	  pieceObjs.forEach(o => {o.checked = false; o.style.background = null});;
 	  if (pieceObjs.every(p => !p.innerHTML)) {
+		++turns;
 		submit();
 		for (i = 0; i < 3; i++) generatePiece();
 	  }
@@ -212,11 +216,14 @@
 	function updateScore() {
 	  document.getElementById("score").innerHTML = score;
 	}
+
+	function updateTurns() {
+	  document.getElementById("turns").innerHTML = turns;
+	}
 </script>
 <body onload="run()">
-  <marquee style="font-size:100pt;" behavior="alternate" direction="left" scrollamount="120"><font color="red">B</font><font color="blue">E</font><font color="yellow">T</font><font color = "green">A</font></marquee>
-
-  Score: <text id="score"></text>
+  Score: <text id="score"></text> 
+  Turns: <text id="turns"></text>
   <pre id="grid"></pre>
   <div class="pieces">
     <button class="piece" id="piece1"></button>
