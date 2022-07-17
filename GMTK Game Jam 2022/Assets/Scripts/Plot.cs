@@ -16,6 +16,10 @@ public class Plot {
         _value = getNewValue();
     }
 
+    public void modify(Modifier modifier) {
+        _value += modifier.value;
+    }
+
     public void sprout() {
         _value = getNewValue();
     }

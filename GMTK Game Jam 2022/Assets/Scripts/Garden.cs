@@ -7,7 +7,7 @@ public class Garden {
     public const int WIDTH = 5;
     public const int HEIGHT = 5;
 
-    public Plot[][] plots { get; }
+    public Plot[][] plots { get; private set; }
 
     public Garden(IRandom rng) {
         plots = new Plot[HEIGHT][];
@@ -21,6 +21,52 @@ public class Garden {
 
     public Plot[] this[int key] {
         get => plots[key];
+    }
+
+    public void modify(Modifier modifier, int topLeftRow, int topLeftColumn) {
+        List<Plot> plotsToModify = new List<Plot>();
+        try {
+            switch (modifier.shape) {
+                case Modifier.Shape.HORIZONTAL:
+                    plotsToModify.Add(plots[topLeftRow][topLeftColumn]);
+                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 1]);
+                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 2]);
+                    break;
+                case Modifier.Shape.VERTICAL:
+                    plotsToModify.Add(plots[topLeftRow][topLeftColumn]);
+                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn]);
+                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn]);
+                    break;
+                case Modifier.Shape.TOP_LEFT:
+                    plotsToModify.Add(plots[topLeftRow][topLeftColumn]);
+                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn]);
+                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 1]);
+                    break;
+                case Modifier.Shape.TOP_RIGHT:
+                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 1]);
+                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 2]);
+                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn + 2]);
+                    break;
+                case Modifier.Shape.BOTTOM_LEFT:
+                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn]);
+                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn]);
+                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn + 1]);
+                    break;
+                case Modifier.Shape.BOTTOM_RIGHT:
+                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn + 2]);
+                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn + 1]);
+                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn + 2]);
+                    break;
+                default:
+                    throw new Exception("Unhandled shape: " + modifier.shape);
+            }
+        } catch (IndexOutOfRangeException e) {
+            throw new Exception(String.Format("Invalid modifier position passed: %s, %d, %d -- ", modifier, topLeftRow, topLeftColumn), e);
+        }
+
+        foreach (Plot plot in plotsToModify) {
+            plot.modify(modifier);
+        }
     }
 
     /// <summary>

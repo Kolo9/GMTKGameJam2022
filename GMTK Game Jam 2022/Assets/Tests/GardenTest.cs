@@ -151,6 +151,96 @@ public class GardenTest {
             5, 6, 1, 2, 2});
     }
 
+    [Test]
+    public void ModifyHorizontal() {
+        Garden garden = new Garden(new MockRandom(1));
+        Modifier modifier = new Modifier(Modifier.Shape.HORIZONTAL, Modifier.Value.PLUS_ONE);
+
+        garden.modify(modifier, 0, 0);
+            
+        Assert.AreEqual(getPlotValues(garden), new int[]{
+            2, 2, 2, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1});
+    }
+
+    [Test]
+    public void ModifyVertical() {
+        Garden garden = new Garden(new MockRandom(1));
+        Modifier modifier = new Modifier(Modifier.Shape.VERTICAL, Modifier.Value.PLUS_ONE);
+
+        garden.modify(modifier, 0, 0);
+
+        Assert.AreEqual(getPlotValues(garden), new int[]{
+            2, 1, 1, 1, 1,
+            2, 1, 1, 1, 1,
+            2, 1, 1, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1});
+    }
+
+    [Test]
+    public void ModifyTopLeft() {
+        Garden garden = new Garden(new MockRandom(1));
+        Modifier modifier = new Modifier(Modifier.Shape.TOP_LEFT, Modifier.Value.PLUS_ONE);
+
+        garden.modify(modifier, 0, 0);
+
+        Assert.AreEqual(getPlotValues(garden), new int[]{
+            2, 2, 1, 1, 1,
+            2, 1, 1, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1});
+    }
+
+    [Test]
+    public void ModifyTopRight() {
+        Garden garden = new Garden(new MockRandom(1));
+        Modifier modifier = new Modifier(Modifier.Shape.TOP_RIGHT, Modifier.Value.PLUS_ONE);
+
+        garden.modify(modifier, 0, 0);
+
+        Assert.AreEqual(getPlotValues(garden), new int[]{
+            1, 2, 2, 1, 1,
+            1, 1, 2, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1});
+    }
+
+    [Test]
+    public void ModifyBottomLeft() {
+        Garden garden = new Garden(new MockRandom(1));
+        Modifier modifier = new Modifier(Modifier.Shape.BOTTOM_LEFT, Modifier.Value.PLUS_ONE);
+
+        garden.modify(modifier, 0, 0);
+
+        Assert.AreEqual(getPlotValues(garden), new int[]{
+            1, 1, 1, 1, 1,
+            2, 1, 1, 1, 1,
+            2, 2, 1, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1});
+    }
+
+    [Test]
+    public void ModifyBottomRight() {
+        Garden garden = new Garden(new MockRandom(1));
+        Modifier modifier = new Modifier(Modifier.Shape.BOTTOM_RIGHT, Modifier.Value.PLUS_ONE);
+
+        garden.modify(modifier, 0, 0);
+
+        Assert.AreEqual(getPlotValues(garden), new int[]{
+            1, 1, 1, 1, 1,
+            1, 1, 2, 1, 1,
+            1, 2, 2, 1, 1,
+            1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1});
+    }
+
     private static int[] getPlotValues(Garden garden) {
         int[] plotValues = new int[Garden.WIDTH * Garden.HEIGHT];
         for (int i = 0; i < Garden.HEIGHT; i++) {
