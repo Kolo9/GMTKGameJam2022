@@ -13,10 +13,10 @@ TagManager:
   - UI
   - Modifier
   - Plot
-  - 
-  - 
-  - 
-  - 
+  - ValueDieCheck
+  - ShapeDieCheck
+  - ShapeDie
+  - ValueDie
   - 
   - 
   - 

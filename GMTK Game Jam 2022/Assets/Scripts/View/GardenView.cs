@@ -24,6 +24,11 @@ public class GardenView : MonoBehaviour {
     [SerializeField]
     private TextMeshProUGUI harvestCompleteText;
     [SerializeField]
+    private ShapeDice shapeDie;
+    [SerializeField]
+    private ValueDice valueDie;
+
+    [SerializeField]
     private AudioClip modifierPickupSound;
     [SerializeField]
     private AudioClip modifierPlacedSound;
@@ -64,36 +69,53 @@ public class GardenView : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
 
         _remainingModifiers = MODIFIERS_PER_TURN;
-        GenerateModifiers();
+        StartCoroutine(GenerateModifiers());
         UpdateGameText();
     }
 
     void Update() {
         if (_remainingModifiers == 0) {
-            GenerateModifiers();
-            if (garden.sprout()) {
-                audioSource.PlayOneShot(sproutSound);
-            } else {
-                OnHarvestComplete();
-            }
-            ResetPlots();
-            UpdateGameText();
+            _remainingModifiers = 3;
+            StartCoroutine(NextTurn());
         }
     }
 
-    private void GenerateModifiers() {
+    private IEnumerator NextTurn() {
+        yield return GenerateModifiers();
+        if (garden.sprout()) {
+            audioSource.PlayOneShot(sproutSound);
+        } else {
+            OnHarvestComplete();
+        }
+        ResetPlots();
+        UpdateGameText();
+    }
+
+    private IEnumerator GenerateModifiers() {
         var shapeOptions = Enum.GetValues(typeof(Modifier.Shape));
         var valueOptions = Enum.GetValues(typeof(Modifier.Value));
         for (int i = 0; i < MODIFIERS_PER_TURN; i++) {
             Modifier.Shape shape = (Modifier.Shape)shapeOptions.GetValue(rng.NextInclusive(0, shapeOptions.Length - 1));
+            yield return StartCoroutine(RollDice());
+            Debug.Log("Rolled a " + ShapeDiceCheck.result);
+            Debug.Log("and a " + ValueDiceCheck.result);
             Modifier.Value value = (Modifier.Value)valueOptions.GetValue(rng.NextInclusive(0, valueOptions.Length - 1));
 
             GameObject prefab = shape == Modifier.Shape.HORIZONTAL || shape == Modifier.Shape.VERTICAL ? lineModifierPrefab : cornerModifierPrefab;
             GameObject modifierObj = Instantiate(prefab, new Vector3(16f, 1.5f, 1.6f + 5.4f * i), prefab.transform.rotation);
             modifierObj.GetComponent<ModifierView>().Init(this, new Modifier(shape, value));
             modifierObj.transform.SetParent(transform);
+            yield return new WaitForSeconds(3);
         }
-        _remainingModifiers = 3;
+    }
+
+    private IEnumerator RollDice() {
+        audioSource.PlayOneShot(diceRollSound);
+        ShapeDiceCheck.result = null;
+        ValueDiceCheck.result = null;
+        shapeDie.Roll();
+        valueDie.Roll();
+        yield return new WaitUntil(() => ShapeDiceCheck.result != null && ValueDiceCheck.result != null);
     }
 
     private void ResetPlots() {

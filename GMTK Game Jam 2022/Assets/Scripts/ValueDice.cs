@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShapeDice : MonoBehaviour {
+public class ValueDice : MonoBehaviour {
     static Rigidbody rigidBody;
     public static Vector3 diceVelocity;
     private readonly IRandom rng = new Random();
