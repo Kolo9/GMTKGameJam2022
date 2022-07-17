@@ -82,9 +82,9 @@ public class GardenView : MonoBehaviour {
 
     private IEnumerator NextTurn() {
         ResetPlots();
-        UpdateGameText();
         if (garden.sprout()) {
             audioSource.PlayOneShot(sproutSound);
+            UpdateGameText();
             yield return GenerateModifiers();
         } else {
             OnHarvestComplete();

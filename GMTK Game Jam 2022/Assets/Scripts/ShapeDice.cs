@@ -6,6 +6,7 @@ public class ShapeDice : MonoBehaviour {
     static Rigidbody rigidBody;
     public static Vector3 diceVelocity;
     private readonly IRandom rng = new Random();
+    private bool triggeredRoll = false;
 
     void Start() {
         rigidBody = GetComponent<Rigidbody>();
@@ -25,10 +26,18 @@ public class ShapeDice : MonoBehaviour {
 
         rigidBody.AddForce(transform.up * 500);
         rigidBody.AddTorque(dirX, dirY, dirZ);
+        triggeredRoll = true;
+    }
+    private IEnumerator TriggerChecker() {
+        yield return null;
         ShapeDiceCheck.rolling = true;
     }
 
     void Update() {
         diceVelocity = rigidBody.velocity;
+        if (triggeredRoll) {
+            triggeredRoll = false;
+            StartCoroutine(TriggerChecker());
+        }
     }
 }
