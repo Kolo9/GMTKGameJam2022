@@ -188,7 +188,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: ac2179cb1a4d6654688cd1da8b171203,
         type: 3}
       propertyPath: m_Name
-      value: dice (1)
+      value: modifier dice (1)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac2179cb1a4d6654688cd1da8b171203, type: 3}
@@ -257,7 +257,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: ac2179cb1a4d6654688cd1da8b171203,
         type: 3}
       propertyPath: m_Name
-      value: dice (2)
+      value: modifier dice (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac2179cb1a4d6654688cd1da8b171203, type: 3}
@@ -1848,12 +1848,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: d89720dbf7472fe4ca8bb1fff06534af,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d89720dbf7472fe4ca8bb1fff06534af,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d89720dbf7472fe4ca8bb1fff06534af,
         type: 3}
@@ -1868,7 +1868,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: d89720dbf7472fe4ca8bb1fff06534af,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 180
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d89720dbf7472fe4ca8bb1fff06534af,
         type: 3}
@@ -1952,7 +1952,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: ac2179cb1a4d6654688cd1da8b171203,
         type: 3}
       propertyPath: m_Name
-      value: dice
+      value: modifier dice
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac2179cb1a4d6654688cd1da8b171203, type: 3}
