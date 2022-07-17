@@ -3,15 +3,16 @@ using System;
 public class Plot {
     public const int MIN_NEW_PLOT_VALUE = 1;
     public const int MAX_NEW_PLOT_VALUE = 6;
-    private static Random rng = new Random();
 
+    private readonly IRandom rng;
     private int _value;
     public int Value {
         get => _value;
         set => _value = value;
     }
 
-    public Plot() {
+    public Plot(IRandom rng) {
+        this.rng = rng;
         _value = getNewValue();
     }
 
@@ -20,6 +21,6 @@ public class Plot {
     }
 
     private int getNewValue() {
-        return rng.Next(MIN_NEW_PLOT_VALUE, MAX_NEW_PLOT_VALUE + 1);
+        return rng.NextInclusive(MIN_NEW_PLOT_VALUE, MAX_NEW_PLOT_VALUE);
     }
 }
