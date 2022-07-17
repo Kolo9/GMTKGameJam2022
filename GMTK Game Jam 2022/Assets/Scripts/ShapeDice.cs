@@ -20,14 +20,19 @@ public class ShapeDice : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space)) {
             // ShapeDiceText.diceShape = ?
 
-            float dirX = rng.NextInclusive(0, 500);
-            float dirY = rng.NextInclusive(0, 500);
-            float dirZ = rng.NextInclusive(0, 500);
-            transform.position = new Vector3(0, 2, 0);
-            transform.rotation = Quaternion.identity;
+            float dirX = rng.NextInclusive(100, 150);
+            float dirY = rng.NextInclusive(100, 150);
+            float dirZ = rng.NextInclusive(100, 150);
+            
+            float rotX = rng.NextInclusive(0, 360);
+            float rotY = rng.NextInclusive(0, 360);
+            float rotZ = rng.NextInclusive(0, 360);
+
+            transform.position = new Vector3(transform.position.x, transform.position.y+6f, transform.position.z);
+            transform.rotation = Quaternion.Euler(rotX, rotY, rotZ);
 
             rigidBody.AddForce(transform.up * 500);
-            rigidBody.AddForce(dirX, dirY, dirZ);
+            rigidBody.AddTorque(dirX, dirY, dirZ);
         }
     }
 }
