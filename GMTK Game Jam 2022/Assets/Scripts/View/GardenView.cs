@@ -22,6 +22,8 @@ public class GardenView : MonoBehaviour {
     [SerializeField]
     private GameObject harvestCompletePanel;
     [SerializeField]
+    private GameObject instructionsPanel;
+    [SerializeField]
     private TextMeshProUGUI harvestCompleteText;
     [SerializeField]
     private ShapeDice shapeDie;
@@ -69,8 +71,6 @@ public class GardenView : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
 
         _remainingModifiers = MODIFIERS_PER_TURN;
-        StartCoroutine(GenerateModifiers());
-        UpdateGameText();
     }
 
     void Update() {
@@ -81,31 +81,31 @@ public class GardenView : MonoBehaviour {
     }
 
     private IEnumerator NextTurn() {
-        yield return GenerateModifiers();
+        ResetPlots();
+        UpdateGameText();
         if (garden.sprout()) {
             audioSource.PlayOneShot(sproutSound);
+            yield return GenerateModifiers();
         } else {
             OnHarvestComplete();
         }
-        ResetPlots();
-        UpdateGameText();
     }
 
     private IEnumerator GenerateModifiers() {
         var shapeOptions = Enum.GetValues(typeof(Modifier.Shape));
         var valueOptions = Enum.GetValues(typeof(Modifier.Value));
         for (int i = 0; i < MODIFIERS_PER_TURN; i++) {
-            Modifier.Shape shape = (Modifier.Shape)shapeOptions.GetValue(rng.NextInclusive(0, shapeOptions.Length - 1));
+            //Modifier.Shape shape = (Modifier.Shape)shapeOptions.GetValue(rng.NextInclusive(0, shapeOptions.Length - 1));
             yield return StartCoroutine(RollDice());
-            Debug.Log("Rolled a " + ShapeDiceCheck.result);
-            Debug.Log("and a " + ValueDiceCheck.result);
-            Modifier.Value value = (Modifier.Value)valueOptions.GetValue(rng.NextInclusive(0, valueOptions.Length - 1));
+            //Modifier.Value value = (Modifier.Value)valueOptions.GetValue(rng.NextInclusive(0, valueOptions.Length - 1));
+            Modifier.Value value = (Modifier.Value)Enum.Parse(typeof(Modifier.Value), ValueDiceCheck.result);
+            Modifier.Shape shape = (Modifier.Shape)Enum.Parse(typeof(Modifier.Shape), ShapeDiceCheck.result);
 
             GameObject prefab = shape == Modifier.Shape.HORIZONTAL || shape == Modifier.Shape.VERTICAL ? lineModifierPrefab : cornerModifierPrefab;
             GameObject modifierObj = Instantiate(prefab, new Vector3(16f, 1.5f, 1.6f + 5.4f * i), prefab.transform.rotation);
             modifierObj.GetComponent<ModifierView>().Init(this, new Modifier(shape, value));
             modifierObj.transform.SetParent(transform);
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(0.4f);
         }
     }
 
@@ -135,8 +135,11 @@ public class GardenView : MonoBehaviour {
     }
 
     public void OnReplant() {
+        instructionsPanel.SetActive(false);
         harvestCompletePanel.SetActive(false);
         garden.Reset();
+        StartCoroutine(GenerateModifiers());
+        UpdateGameText();
     }
 
     public void OnModifierPickup() {

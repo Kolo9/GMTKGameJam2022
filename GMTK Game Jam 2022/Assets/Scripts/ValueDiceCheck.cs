@@ -3,23 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ValueDiceCheck : MonoBehaviour {
-    static Vector3 diceVelocity;
     public static string result;
-    private bool rolling;
+    public static bool rolling;
 
     void Start() {
-        diceVelocity = ValueDice.diceVelocity;
         result = null;
         rolling = false;
     }
 
     void OnTriggerStay(Collider other) {
-        bool moving = !diceVelocity.Equals(Vector3.zero);
-        Debug.LogError("Moving? " + moving);
-        if (moving) {
-            rolling = true;
-        } else if (rolling) {
-            // Stopped moving
+        if (!rolling) {
+            return;
+        }
+        if (ValueDice.diceVelocity.Equals(Vector3.zero)) {
             rolling = false;
             result = other.gameObject.name;
         }

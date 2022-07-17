@@ -25,6 +25,7 @@ public class ValueDice : MonoBehaviour {
 
         rigidBody.AddForce(transform.up * 500);
         rigidBody.AddTorque(dirX, dirY, dirZ);
+        ValueDiceCheck.rolling = true;
     }
 
     void Update() {

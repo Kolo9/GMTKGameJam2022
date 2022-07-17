@@ -25,6 +25,7 @@ public class ShapeDice : MonoBehaviour {
 
         rigidBody.AddForce(transform.up * 500);
         rigidBody.AddTorque(dirX, dirY, dirZ);
+        ShapeDiceCheck.rolling = true;
     }
 
     void Update() {
