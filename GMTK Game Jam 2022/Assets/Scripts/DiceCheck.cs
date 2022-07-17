@@ -18,7 +18,6 @@ public class DiceCheck : MonoBehaviour
                 
             //     default:
             // }
-            Debug.Log(other.gameObject.name + " is up!");
         }
     }
 }

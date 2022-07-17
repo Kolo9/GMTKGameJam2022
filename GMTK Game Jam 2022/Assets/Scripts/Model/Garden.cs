@@ -8,8 +8,11 @@ public class Garden {
     public const int HEIGHT = 5;
 
     public Plot[][] plots { get; private set; }
+    public int score { get; private set; }
+    public int turn { get; private set; }
+    private readonly IRandom rng;
 
-    public Garden(IRandom rng) {
+    public Garden(IRandom rng, bool skipSproutForTest = false) {
         plots = new Plot[HEIGHT][];
         for (int i = 0; i < HEIGHT; i++) {
             plots[i] = new Plot[WIDTH];
@@ -17,108 +20,119 @@ public class Garden {
                 plots[i][j] = new Plot(rng);
             }
         }
+
+        this.rng = rng;
+        Reset(skipSproutForTest);
+    }
+
+    public void Reset(bool skipSproutForTest = false) {
+        for (int i = 0; i < HEIGHT; i++) {
+            for (int j = 0; j < WIDTH; j++) {
+                plots[i][j].Reset();
+            }
+        }
+        if (!skipSproutForTest) {
+            sprout();
+        }
+        score = 0;
+        turn = 1;
     }
 
     public Plot[] this[int key] {
         get => plots[key];
     }
 
-    public void modify(Modifier modifier, int topLeftRow, int topLeftColumn) {
+    /// <summary>
+    /// Applies a modifier piece.
+    /// For lines, expects the middle cell.
+    /// For corners, expects the corner cell.
+    /// </summary>
+    public bool modify(Modifier modifier, int row, int col) {
         List<Plot> plotsToModify = new List<Plot>();
         try {
             switch (modifier.shape) {
                 case Modifier.Shape.HORIZONTAL:
-                    plotsToModify.Add(plots[topLeftRow][topLeftColumn]);
-                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 1]);
-                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 2]);
+                    plotsToModify.Add(plots[row][col - 1]);
+                    plotsToModify.Add(plots[row][col]);
+                    plotsToModify.Add(plots[row][col + 1]);
                     break;
                 case Modifier.Shape.VERTICAL:
-                    plotsToModify.Add(plots[topLeftRow][topLeftColumn]);
-                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn]);
-                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn]);
+                    plotsToModify.Add(plots[row - 1][col]);
+                    plotsToModify.Add(plots[row][col]);
+                    plotsToModify.Add(plots[row + 1][col]);
                     break;
                 case Modifier.Shape.TOP_LEFT:
-                    plotsToModify.Add(plots[topLeftRow][topLeftColumn]);
-                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn]);
-                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 1]);
+                    plotsToModify.Add(plots[row][col]);
+                    plotsToModify.Add(plots[row + 1][col]);
+                    plotsToModify.Add(plots[row][col + 1]);
                     break;
                 case Modifier.Shape.TOP_RIGHT:
-                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 1]);
-                    plotsToModify.Add(plots[topLeftRow][topLeftColumn + 2]);
-                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn + 2]);
+                    plotsToModify.Add(plots[row][col]);
+                    plotsToModify.Add(plots[row][col - 1]);
+                    plotsToModify.Add(plots[row + 1][col]);
                     break;
                 case Modifier.Shape.BOTTOM_LEFT:
-                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn]);
-                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn]);
-                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn + 1]);
+                    plotsToModify.Add(plots[row][col]);
+                    plotsToModify.Add(plots[row - 1][col]);
+                    plotsToModify.Add(plots[row][col + 1]);
                     break;
                 case Modifier.Shape.BOTTOM_RIGHT:
-                    plotsToModify.Add(plots[topLeftRow + 1][topLeftColumn + 2]);
-                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn + 1]);
-                    plotsToModify.Add(plots[topLeftRow + 2][topLeftColumn + 2]);
+                    plotsToModify.Add(plots[row][col]);
+                    plotsToModify.Add(plots[row - 1][col]);
+                    plotsToModify.Add(plots[row][col - 1]);
                     break;
                 default:
                     throw new Exception("Unhandled shape: " + modifier.shape);
             }
-        } catch (IndexOutOfRangeException e) {
-            throw new Exception(String.Format("Invalid modifier position passed: %s, %d, %d -- ", modifier, topLeftRow, topLeftColumn), e);
+        } catch (IndexOutOfRangeException) {
+            Debug.Log(String.Format("Invalid modifier position passed: {0}, {1}, {2} -- ", modifier, row, col));
+            return false;
         }
 
         foreach (Plot plot in plotsToModify) {
             plot.modify(modifier);
         }
+        return true;
     }
 
     /// <summary>
-    /// Sprouts the garden until there is nothing else to sprout.
+    /// Sprouts the garden repeatedly until there is nothing else to sprout.
     /// </summary>
-    /// <returns>The added score (including chain reactions)</returns>
-    public int sprout() {
-        int score = 0;
-
-        // Remove.
-        int[] plotValues = new int[Garden.WIDTH * Garden.HEIGHT];
-        for (int i = 0; i < Garden.HEIGHT; i++) {
-            for (int j = 0; j < Garden.WIDTH; j++) {
-                plotValues[i * Garden.HEIGHT + j] = plots[i][j].Value;
-            }
-        }
-
-        Tuple<int, bool> sproutResult = sproutOnce();
-        score += sproutResult.Item1;
-
-        if (sproutResult.Item2) {
-            score += sprout();
-        }
-        return score;
+    /// <returns>Whether anything was sprouted.</returns>
+    public bool sprout() {
+        bool sprouted = false;
+        while (sproutOnce()) {
+            sprouted = true;
+        };
+        turn++;
+        return sprouted;
     }
 
     /// <summary>
     /// Sprouts the garden once, looking for rows and columns of 3+ matching numbers.
     /// </summary>
-    /// <returns>The added score and whether anything was sprouted.</returns>
-    public Tuple<int, bool> sproutOnce() {
-        int score = 0;
+    /// <returns>Whether anything was sprouted.</returns>
+    public bool sproutOnce() {
         HashSet<Plot> sproutedPlots = new HashSet<Plot>();
         for (int i = 0; i < HEIGHT; i++) {
-            score += sprout(plots[i], sproutedPlots);
+            score += sproutSection(plots[i], sproutedPlots);
         }
         for (int j = 0; j < WIDTH; j++) {
             Plot[] col = new Plot[HEIGHT];
             for (int i = 0; i < HEIGHT; i++) {
                 col[i] = plots[i][j];
             }
-            score += sprout(col, sproutedPlots);
+            score += sproutSection(col, sproutedPlots);
         }
 
         foreach (Plot plot in sproutedPlots) {
             plot.sprout();
         }
 
-        return new Tuple<int, bool>(score, sproutedPlots.Count > 0);
+        return sproutedPlots.Count > 0;
     }
 
-    private static int sprout(Plot[] plots, HashSet<Plot> sproutedPlots) {
+    private static int sproutSection(Plot[] plots, HashSet<Plot> sproutedPlots) {
         int score = 0;
         List<Plot> matchingPlots = new List<Plot>();
         for (int start = 0; start < plots.Length;) {

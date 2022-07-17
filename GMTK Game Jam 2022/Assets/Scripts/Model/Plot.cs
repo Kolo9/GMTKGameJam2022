@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class Plot {
     public const int MIN_NEW_PLOT_VALUE = 1;
@@ -6,6 +7,9 @@ public class Plot {
 
     private readonly IRandom rng;
     private int _value;
+
+    public delegate void OnModifiedDelegate();
+    public event OnModifiedDelegate OnModified;
     public int Value {
         get => _value;
         set => _value = value;
@@ -13,18 +17,25 @@ public class Plot {
 
     public Plot(IRandom rng) {
         this.rng = rng;
-        _value = getNewValue();
+        getNewValue();
     }
 
     public void modify(Modifier modifier) {
-        _value += modifier.value;
+        _value = Math.Max(0, _value + modifier.value);
+        if (OnModified != null) {
+            OnModified();
+        }
     }
 
     public void sprout() {
-        _value = getNewValue();
+        getNewValue();
+    }
+    
+    public void Reset() {
+        getNewValue();
     }
 
-    private int getNewValue() {
-        return rng.NextInclusive(MIN_NEW_PLOT_VALUE, MAX_NEW_PLOT_VALUE);
+    private void getNewValue() {
+        _value = rng.NextInclusive(MIN_NEW_PLOT_VALUE, MAX_NEW_PLOT_VALUE);
     }
 }

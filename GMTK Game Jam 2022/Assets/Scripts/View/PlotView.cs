@@ -4,10 +4,12 @@ using UnityEngine;
 using TMPro;
 
 public class PlotView : MonoBehaviour {
+    private static Color32 NORMAL_COLOR = new Color32(31, 156, 30, 212);
+    private static Color32 MODIFIED_COLOR = new Color32(221, 130, 49, 212);
 
-    internal Plot plot = null;
-    private int row = -1;
-    private int col;
+    private Plot plot;
+    public int row { get; private set; } = -1;
+    public int col { get; private set; } = -1;
     private GardenView gardenView;
     private TextMeshPro text;
 
@@ -18,6 +20,8 @@ public class PlotView : MonoBehaviour {
 
         this.text = GetComponentInChildren<TextMeshPro>();
         this.plot = gardenView.garden[row][col];
+        ResetColor();
+        plot.OnModified += OnModified;
     }
 
     // Update is called once per frame
@@ -26,5 +30,13 @@ public class PlotView : MonoBehaviour {
             return;
         }
         text.text = plot.Value.ToString();
+    }
+
+    private void OnModified() {
+        text.color = MODIFIED_COLOR;
+    }
+
+    public void ResetColor() {
+        text.color = NORMAL_COLOR;
     }
 }
