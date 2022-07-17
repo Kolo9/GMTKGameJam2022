@@ -15,6 +15,7 @@ public class ValueDiceCheck : MonoBehaviour {
 
     void OnTriggerStay(Collider other) {
         bool moving = !diceVelocity.Equals(Vector3.zero);
+        Debug.LogError("Moving? " + moving);
         if (moving) {
             rolling = true;
         } else if (rolling) {
