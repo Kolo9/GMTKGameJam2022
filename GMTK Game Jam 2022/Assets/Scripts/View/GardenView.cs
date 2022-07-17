@@ -20,6 +20,10 @@ public class GardenView : MonoBehaviour {
     [SerializeField]
     private TextMeshPro gameText;
     [SerializeField]
+    private GameObject harvestCompletePanel;
+    [SerializeField]
+    private TextMeshProUGUI harvestCompleteText;
+    [SerializeField]
     private AudioClip modifierPickupSound;
     [SerializeField]
     private AudioClip modifierPlacedSound;
@@ -70,9 +74,7 @@ public class GardenView : MonoBehaviour {
             if (garden.sprout()) {
                 audioSource.PlayOneShot(sproutSound);
             } else {
-                audioSource.PlayOneShot(harvestCompleteSound);
-                // Game over.
-                garden.Reset();
+                OnHarvestComplete();
             }
             ResetPlots();
             UpdateGameText();
@@ -102,6 +104,17 @@ public class GardenView : MonoBehaviour {
 
     private void UpdateGameText() {
         gameText.text = String.Format("Score: {0}\nTurn: {1}", garden.score, garden.turn);
+    }
+
+    private void OnHarvestComplete() {
+        harvestCompleteText.text = String.Format("Harvest complete!\n\nFinal score: {0}\nTurns: {1}", garden.score, garden.turn);
+        harvestCompletePanel.SetActive(true);
+        audioSource.PlayOneShot(harvestCompleteSound);
+    }
+
+    public void OnReplant() {
+        harvestCompletePanel.SetActive(false);
+        garden.Reset();
     }
 
     public void OnModifierPickup() {

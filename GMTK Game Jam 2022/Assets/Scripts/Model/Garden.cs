@@ -104,7 +104,9 @@ public class Garden {
         while (sproutOnce()) {
             sprouted = true;
         };
-        turn++;
+        if (sprouted) {
+            turn++;
+        }
         return sprouted;
     }
 
