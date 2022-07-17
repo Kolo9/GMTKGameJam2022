@@ -11,6 +11,10 @@ public class ModifierView : MonoBehaviour {
     private Modifier modifier;
     private Vector3 startPos;
 
+    void Start() {
+        startPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+    }
+
     public void Init(GardenView gardenView, Modifier modifier) {
         this.gardenView = gardenView;
         this.modifier = modifier;
@@ -44,7 +48,13 @@ public class ModifierView : MonoBehaviour {
                 break;
         }
         textObj.text = (modifier.value > 0 ? "+" : "") + modifier.value;
-        startPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+    }
+
+    private void OnMouseDown() {
+        if (modifier == null) {
+            return;
+        }
+        gardenView.OnModifierPickup();
     }
 
     void OnMouseDrag() {
@@ -67,7 +77,7 @@ public class ModifierView : MonoBehaviour {
 
         PlotView hitPlotView = hit.transform.gameObject.GetComponent<PlotView>();
         if (gardenView.garden.modify(modifier, hitPlotView.row, hitPlotView.col)) {
-            gardenView.remainingModifiers--;
+            gardenView.RemainingModifiers--;
             Destroy(gameObject);
         } else {
             transform.position = startPos;

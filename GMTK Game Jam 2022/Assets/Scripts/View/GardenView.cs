@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class GardenView : MonoBehaviour {
     private const float PLOT_SPACING = 2.5f;
     private const int MODIFIERS_PER_TURN = 3;
@@ -18,8 +19,29 @@ public class GardenView : MonoBehaviour {
     private GameObject cornerModifierPrefab;
     [SerializeField]
     private TextMeshPro gameText;
+    [SerializeField]
+    private AudioClip modifierPickupSound;
+    [SerializeField]
+    private AudioClip modifierPlacedSound;
+    [SerializeField]
+    private AudioClip sproutSound;
+    [SerializeField]
+    private AudioClip diceRollSound;
+    [SerializeField]
+    private AudioClip harvestCompleteSound;
 
-    public int remainingModifiers { get; set; }
+    private AudioSource audioSource;
+
+    private int _remainingModifiers;
+    public int RemainingModifiers {
+        get { return _remainingModifiers;  }
+        set {
+            if (value < _remainingModifiers) {
+                audioSource.PlayOneShot(modifierPlacedSound);
+            }
+            _remainingModifiers = value;
+        }
+    }
     public readonly Garden garden = new Garden(new Random());
     private PlotView[] plotViews;
 
@@ -35,16 +57,20 @@ public class GardenView : MonoBehaviour {
                 plotObj.transform.SetParent(transform);
             }
         }
+        audioSource = GetComponent<AudioSource>();
 
-        remainingModifiers = MODIFIERS_PER_TURN;
+        _remainingModifiers = MODIFIERS_PER_TURN;
         GenerateModifiers();
         UpdateGameText();
     }
 
     void Update() {
-        if (remainingModifiers == 0) {
+        if (_remainingModifiers == 0) {
             GenerateModifiers();
-            if (!garden.sprout()) {
+            if (garden.sprout()) {
+                audioSource.PlayOneShot(sproutSound);
+            } else {
+                audioSource.PlayOneShot(harvestCompleteSound);
                 // Game over.
                 garden.Reset();
             }
@@ -65,7 +91,7 @@ public class GardenView : MonoBehaviour {
             modifierObj.GetComponent<ModifierView>().Init(this, new Modifier(shape, value));
             modifierObj.transform.SetParent(transform);
         }
-        remainingModifiers = 3;
+        _remainingModifiers = 3;
     }
 
     private void ResetPlots() {
@@ -76,5 +102,9 @@ public class GardenView : MonoBehaviour {
 
     private void UpdateGameText() {
         gameText.text = String.Format("Score: {0}\nTurn: {1}", garden.score, garden.turn);
+    }
+
+    public void OnModifierPickup() {
+        audioSource.PlayOneShot(modifierPickupSound);
     }
 }
