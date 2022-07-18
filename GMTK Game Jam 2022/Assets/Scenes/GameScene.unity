@@ -3552,6 +3552,16 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5826868104980022144, guid: 9e6ff10cf5703814789e535e7352b407,
+        type: 3}
+      propertyPath: m_AngularDrag
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 5826868104980022144, guid: 9e6ff10cf5703814789e535e7352b407,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5826868104980022204, guid: 9e6ff10cf5703814789e535e7352b407,
         type: 3}
       propertyPath: m_Name
