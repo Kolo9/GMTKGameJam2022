@@ -7,12 +7,10 @@ public class Menu : MonoBehaviour
     public SceneFader sceneFader;
 
     public void Play() {
-        Debug.Log("clicked play");
         sceneFader.FadeTo("GameScene");
     }
 
     public void Instructions() {
-        Debug.Log("clicked instructions");
         sceneFader.FadeTo("GameScene");
     }
 
